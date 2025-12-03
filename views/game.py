@@ -31,8 +31,8 @@ player2_controls = {
     "attack": pygame.K_h,
 }
 
-# Definir paredes, pisos y plataformas diagonales
-colliders = [
+# Definir paredes, pisos y plataformas diagonales para el mapa original
+original_colliders = [
     pygame.Rect(200, 600, 119, 20),
     pygame.Rect(450, 550, 219, 20),
     pygame.Rect(60, 630, 26, 20),
@@ -42,13 +42,22 @@ colliders = [
     pygame.Rect(1270, 0, 10, 720),  # Pared derecha
 ]
 
-diagonal_platforms = [
+original_diagonal_platforms = [
     DiagonalPlatform(70, 730, 200, 600),
     DiagonalPlatform(350, 650, 450, 550),
     DiagonalPlatform(570, 730, 800, 500),
     DiagonalPlatform(0, 700, 60, 630),
     DiagonalPlatform(1060, 500, 1170, 600),
 ]
+
+# Definir colisionadores para el mapa plano - solo un piso recto
+flat_colliders = [
+    pygame.Rect(0, 596, 1280, 20),  # Piso plano
+    pygame.Rect(0, 0, 10, 720),  # Pared izquierda
+    pygame.Rect(1270, 0, 10, 720),  # Pared derecha
+]
+
+flat_diagonal_platforms = []  # Sin plataformas diagonales en el mapa plano
 
 
 def handle_combat(player1, player2):
@@ -87,6 +96,15 @@ def render_game(screen, player1_sprites, player2_sprites, background_path):
         _cached_background_path = background_path
 
     game_background = _cached_background
+
+    # Select colliders based on the map type
+    is_flat_map = "background_flat" in background_path
+    if is_flat_map:
+        colliders = flat_colliders
+        diagonal_platforms = flat_diagonal_platforms
+    else:
+        colliders = original_colliders
+        diagonal_platforms = original_diagonal_platforms
 
     player1 = Player(
         x=1130,
