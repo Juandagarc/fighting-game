@@ -18,6 +18,7 @@ DARK_GRAY = (100, 100, 100)
 # Map options
 ORIGINAL_MAP_PATH = os.path.join(current_dir, "../assets/game/background.png")
 FLAT_MAP_PATH = os.path.join(current_dir, "../assets/game/background_flat.png")
+TEST_ARENA_PATH = "test_arena"
 
 # Lazy-loaded thumbnails
 _original_thumbnail = None
@@ -44,9 +45,9 @@ def draw_text(surface, text, font, color, x, y):
     surface.blit(text_surface, text_rect)
 
 
-def render_map_selection(screen):
+def render_map_selection(screen, is_single_player=False):
     """
-    Renders the map selection view with 2 map options.
+    Renders the map selection view with map options.
     Returns the path of the selected map when clicked, or None if no selection made.
     """
     # Load thumbnails lazily
@@ -55,12 +56,14 @@ def render_map_selection(screen):
     # Fill background with dark color
     screen.fill(DARK_GRAY)
 
-    # Draw the title
-    draw_text(screen, "Selecciona un Mapa", title_font, WHITE, 640, 80)
+    # Draw the title with mode indication
+    mode_text = "Un Jugador" if is_single_player else "Dos Jugadores"
+    draw_text(screen, f"Selecciona un Mapa - {mode_text}", title_font, WHITE, 640, 80)
 
     # Define map selection areas
-    original_rect = pygame.Rect(140, 200, 400, 225)
-    flat_rect = pygame.Rect(740, 200, 400, 225)
+    original_rect = pygame.Rect(140, 180, 400, 225)
+    flat_rect = pygame.Rect(740, 180, 400, 225)
+    test_arena_rect = pygame.Rect(440, 430, 400, 80)
 
     # Draw map thumbnails with borders
     pygame.draw.rect(screen, WHITE, original_rect.inflate(10, 10), 3)
@@ -69,9 +72,13 @@ def render_map_selection(screen):
     pygame.draw.rect(screen, WHITE, flat_rect.inflate(10, 10), 3)
     screen.blit(_flat_thumbnail, flat_rect.topleft)
 
+    # Draw Test Arena button (only useful for debugging AI)
+    pygame.draw.rect(screen, GRAY, test_arena_rect)
+    draw_text(screen, "Test Arena (Fondo Negro)", button_font, BLACK, test_arena_rect.centerx, test_arena_rect.centery)
+
     # Draw map labels
-    draw_text(screen, "Mapa Original", button_font, WHITE, 340, 460)
-    draw_text(screen, "Mapa Plano", button_font, WHITE, 940, 460)
+    draw_text(screen, "Mapa Original", button_font, WHITE, 340, 420)
+    draw_text(screen, "Mapa Plano", button_font, WHITE, 940, 420)
 
     # Draw back button
     back_button = pygame.Rect(540, 550, 200, 50)
@@ -82,5 +89,6 @@ def render_map_selection(screen):
     return {
         "original": {"rect": original_rect, "path": ORIGINAL_MAP_PATH},
         "flat": {"rect": flat_rect, "path": FLAT_MAP_PATH},
+        "test_arena": {"rect": test_arena_rect, "path": TEST_ARENA_PATH},
         "back": {"rect": back_button, "path": None}
     }

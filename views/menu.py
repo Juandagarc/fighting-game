@@ -70,8 +70,8 @@ def render_menu(screen):
 
     # Define buttons
     buttons = [
-        create_button(480, 260, 300, 70, "Jugar", button_font, GRAY, BLACK),
-        create_button(480, 350, 300, 70, "Test AI Arena", button_font, GRAY, BLACK),
+        create_button(480, 260, 300, 70, "Un Jugador", button_font, GRAY, BLACK),
+        create_button(480, 350, 300, 70, "Dos Jugadores", button_font, GRAY, BLACK),
         create_button(480, 440, 300, 70, "Cómo se juega", button_font, GRAY, BLACK),
         create_button(480, 530, 300, 70, "Salir", button_font, GRAY, BLACK),
     ]
