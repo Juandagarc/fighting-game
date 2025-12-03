@@ -29,10 +29,10 @@ player1_sprites = {
 }
 
 player2_sprites = {
-    "idle": pygame.image.load(os.path.join(current_dir, "assets/game/samurai/IDLE.png")).convert_alpha(),
-    "running": pygame.image.load(os.path.join(current_dir, "assets/game/samurai/RUN.png")).convert_alpha(),
-    "jumping": pygame.image.load(os.path.join(current_dir, "assets/game/samurai/RUN.png")).convert_alpha(),
-    "attacking": pygame.image.load(os.path.join(current_dir, "assets/game/samurai/ATTACK.png")).convert_alpha(),
+    "idle": pygame.image.load(os.path.join(current_dir, "assets/game/knight/idle.png")).convert_alpha(),
+    "running": pygame.image.load(os.path.join(current_dir, "assets/game/knight/run.png")).convert_alpha(),
+    "jumping": pygame.image.load(os.path.join(current_dir, "assets/game/knight/jump.png")).convert_alpha(),
+    "attacking": pygame.image.load(os.path.join(current_dir, "assets/game/knight/attack.png")).convert_alpha(),
 }
 
 # Control del estado del juego

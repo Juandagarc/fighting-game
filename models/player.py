@@ -1,11 +1,17 @@
 import pygame
 
 class Player:
-    def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed):
+    def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed, hitbox_width=None, hitbox_height=None, sprite_offset_y=0):
         """
         Initialize the player object with animations for different states.
         """
-        self.rect = pygame.Rect(x, y, frame_width - 10, frame_height)
+        # Si no se especifica hitbox, usar valores basados en el frame
+        if hitbox_width is None:
+            hitbox_width = frame_width - 10
+        if hitbox_height is None:
+            hitbox_height = frame_height
+
+        self.rect = pygame.Rect(x, y, hitbox_width, hitbox_height)
         self.controls = controls
         self.health = 100
         self.is_attacking = False  # Asegúrate de definirlo aquí
@@ -25,6 +31,7 @@ class Player:
         self.frame_width = frame_width
         self.frame_height = frame_height
         self.animations = {state: self._load_frames(sheet) for state, sheet in sprite_sheets.items()}
+        self.sprite_offset_y = sprite_offset_y  # Offset vertical para el sprite
 
         # Validar que cada animación tiene fotogramas
         for state, frames in self.animations.items():
@@ -218,9 +225,9 @@ class Player:
         if self.facing_left:
             frame = pygame.transform.flip(frame, True, False)
 
-        # Dibujar el fotograma
+        # Dibujar el fotograma centrado horizontalmente y alineado al bottom de la hitbox
         sprite_x = self.rect.centerx - frame.get_width() // 2
-        sprite_y = self.rect.bottom - frame.get_height() + 40
+        sprite_y = self.rect.bottom - frame.get_height() + 40 + self.sprite_offset_y
         screen.blit(frame, (sprite_x, sprite_y))
 
         # Dibujar barra de vida
