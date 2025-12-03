@@ -26,6 +26,16 @@ class Player:
 
         self.facing_left = False  # Nueva bandera para determinar la dirección
 
+        # Controles del jugador
+        self.controls = controls
+
+        # Atributos de combate
+        self.health = 100
+        self.is_attacking = False
+        self.is_defending = False
+        self.last_attack_time = 0
+        self.attack_cooldown = 500  # Milisegundos
+
         # Animations for different states
         self.sprite_sheets = sprite_sheets
         self.frame_width = frame_width
@@ -232,10 +242,10 @@ class Player:
 
         # Dibujar barra de vida
         health_bar_width = 50
-        health_bar_height = 8
-        health_ratio = self.health / 100
+        health_bar_height = 5
         bar_x = self.rect.centerx - health_bar_width // 2
-        bar_y = self.rect.top - health_bar_height - 5
+        bar_y = self.rect.top - 10
+        health_ratio = self.health / 100
         pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, health_bar_width, health_bar_height))
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, health_bar_width * health_ratio, health_bar_height))
         # Dibujar la hitbox (opcional, para depuración)

@@ -132,6 +132,7 @@ def render_game(screen, player1_sprites, player2_sprites, background_path):
     )
 
     clock = pygame.time.Clock()
+
     while game_active:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
