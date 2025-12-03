@@ -3,13 +3,11 @@ import os
 from models.player import Player
 from models.DiagonalPlatform import DiagonalPlatform
 
-# Cargar fondo del juego
 current_dir = os.path.dirname(__file__)
-game_background_path = os.path.join(current_dir, "../assets/game/background.png")
-game_background = pygame.image.load(game_background_path)
-game_background = pygame.transform.scale(game_background, (1280, 720))
 
 game_active = True
+_cached_background = None
+_cached_background_path = None
 
 font_path = os.path.join(current_dir, "../assets/fonts/Tiny5/Tiny5-Regular.ttf")
 title_font = pygame.font.Font(font_path, 80)
@@ -33,8 +31,8 @@ player2_controls = {
     "attack": pygame.K_h,
 }
 
-# Definir paredes, pisos y plataformas diagonales
-colliders = [
+# Definir paredes, pisos y plataformas diagonales para el mapa original
+original_colliders = [
     pygame.Rect(200, 600, 119, 20),
     pygame.Rect(450, 550, 219, 20),
     pygame.Rect(60, 630, 26, 20),
@@ -44,13 +42,22 @@ colliders = [
     pygame.Rect(1270, 0, 10, 720),  # Pared derecha
 ]
 
-diagonal_platforms = [
+original_diagonal_platforms = [
     DiagonalPlatform(70, 730, 200, 600),
     DiagonalPlatform(350, 650, 450, 550),
     DiagonalPlatform(570, 730, 800, 500),
     DiagonalPlatform(0, 700, 60, 630),
     DiagonalPlatform(1060, 500, 1170, 600),
 ]
+
+# Definir colisionadores para el mapa plano - solo un piso recto
+flat_colliders = [
+    pygame.Rect(0, 596, 1280, 20),  # Piso plano
+    pygame.Rect(0, 0, 10, 720),  # Pared izquierda
+    pygame.Rect(1270, 0, 10, 720),  # Pared derecha
+]
+
+flat_diagonal_platforms = []  # Sin plataformas diagonales en el mapa plano
 
 
 def handle_combat(player1, player2):
@@ -76,19 +83,36 @@ def render_colliders(screen, colliders, diagonal_platforms):
         pygame.draw.line(screen, (0, 255, 255), (platform.x1, platform.y1), (platform.x2, platform.y2), 1)
 
 
-def render_game(screen, player1_sprites, player2_sprites):
+def render_game(screen, player1_sprites, player2_sprites, background_path):
     """
     Renderizar la vista del juego.
     """
-    global game_active  # Acceder a la variable global
+    global game_active, _cached_background, _cached_background_path
+
+    # Load and cache background only if path changed
+    if _cached_background is None or _cached_background_path != background_path:
+        _cached_background = pygame.image.load(background_path)
+        _cached_background = pygame.transform.scale(_cached_background, (1280, 720))
+        _cached_background_path = background_path
+
+    game_background = _cached_background
+
+    # Select colliders based on the map type
+    is_flat_map = "background_flat" in background_path
+    if is_flat_map:
+        colliders = flat_colliders
+        diagonal_platforms = flat_diagonal_platforms
+    else:
+        colliders = original_colliders
+        diagonal_platforms = original_diagonal_platforms
 
     player1 = Player(
         x=1130,
         y=300,
         sprite_sheets=player1_sprites,
         controls=player1_controls,
-        frame_width=96,  # Ancho de un fotograma
-        frame_height=96,  # Alto de un fotograma
+        frame_width=96,  # Ancho de un fotograma (samurai)
+        frame_height=96,  # Alto de un fotograma (samurai)
         animation_speed=5,  # Velocidad de animación
         hitbox_width=85,  # Hitbox un poco más ancha
         hitbox_height=90  # Hitbox consistente
@@ -104,7 +128,7 @@ def render_game(screen, player1_sprites, player2_sprites):
         animation_speed=5,  # Velocidad de animación
         hitbox_width=85,  # Hitbox un poco más ancha
         hitbox_height=90,  # Hitbox consistente
-        sprite_offset_y=-40  # Mover el sprite 40 píxeles hacia arriba
+        sprite_offset_y=-30  # Mover el sprite 30 píxeles hacia arriba
     )
 
     clock = pygame.time.Clock()

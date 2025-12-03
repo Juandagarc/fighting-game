@@ -5,12 +5,19 @@ class Player:
         """
         Initialize the player object with animations for different states.
         """
+        # Si no se especifica hitbox, usar valores basados en el frame
         if hitbox_width is None:
             hitbox_width = frame_width - 10
         if hitbox_height is None:
             hitbox_height = frame_height
 
         self.rect = pygame.Rect(x, y, hitbox_width, hitbox_height)
+        self.controls = controls
+        self.health = 100
+        self.is_attacking = False  # Asegúrate de definirlo aquí
+        self.is_defending = False
+        self.attack_cooldown = 500  # En milisegundos (0.5 segundos)
+        self.last_attack_time = 0  # Marca de tiempo del último ataque
         self.velocity = 5
         self.y_velocity = 0
         self.gravity = 0.5
@@ -35,6 +42,7 @@ class Player:
         self.frame_height = frame_height
         self.animations = {state: self._load_frames(sheet) for state, sheet in sprite_sheets.items()}
         self.sprite_offset_y = sprite_offset_y  # Offset vertical para el sprite
+
         # Validar que cada animación tiene fotogramas
         for state, frames in self.animations.items():
             if len(frames) == 0:
