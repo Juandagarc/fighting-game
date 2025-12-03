@@ -1,0 +1,12 @@
+[project]
+name = "fighting-game"
+version = "1.0.0"
+description = "A 2D fighting game developed with Pygame featuring samurai combat"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pygame>=2.0.0",
+]
+
+[project.scripts]
+fighting-game = "main:main"
