@@ -1,6 +1,11 @@
 import pygame
 import random
 
+# AI behavior constants
+AI_ATTACK_RANGE = 100  # Distance within which AI will attack
+AI_DEFENSE_PROBABILITY = 0.1  # 10% chance to block when target is attacking
+
+
 class Player:
     def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed, hitbox_width=None, hitbox_height=None, sprite_offset_y=0):
         """
@@ -225,39 +230,43 @@ class Player:
         self.rect.x += self.velocity
         self.facing_left = False
 
+    def _handle_wall_collision(self, colliders, moving_right):
+        """
+        Handle collision with walls after movement.
+        moving_right: True if moving right, False if moving left.
+        """
+        for collider in colliders:
+            if self.rect.colliderect(collider):
+                if moving_right:
+                    self.rect.right = collider.left
+                else:
+                    self.rect.left = collider.right
+                break
+
     def update_ai(self, target_player, colliders):
         """
         Update the AI-controlled player's behavior based on the target player's position.
         """
-        attack_range = 100  # Distance within which AI will attack
         distance_x = abs(self.rect.x - target_player.rect.x)
 
         # Reset defending state at the start of each update
         self.is_defending = False
 
         # MOVEMENT: If target is far, move towards them
-        if distance_x > attack_range:
+        if distance_x > AI_ATTACK_RANGE:
             if self.rect.x < target_player.rect.x:
                 self.move_right()
-                # Check for wall collision
-                for collider in colliders:
-                    if self.rect.colliderect(collider):
-                        self.rect.right = collider.left
-                        break
+                self._handle_wall_collision(colliders, moving_right=True)
             else:
                 self.move_left()
-                # Check for wall collision
-                for collider in colliders:
-                    if self.rect.colliderect(collider):
-                        self.rect.left = collider.right
-                        break
+                self._handle_wall_collision(colliders, moving_right=False)
             # Update animation to running
             if self.current_animation != "running":
                 self.current_animation = "running"
                 self.current_frame = 0
 
         # ATTACK: If in range and cooldown is ready
-        elif distance_x <= attack_range and self.can_attack():
+        elif distance_x <= AI_ATTACK_RANGE and self.can_attack():
             self.is_attacking = True
             self.last_attack_time = pygame.time.get_ticks()
             if self.current_animation != "attacking":
@@ -272,7 +281,7 @@ class Player:
             self.is_attacking = False
 
         # DEFENSE: Random chance to block if target is attacking
-        if target_player.is_attacking and random.random() < 0.1:  # 10% chance
+        if target_player.is_attacking and random.random() < AI_DEFENSE_PROBABILITY:
             self.is_defending = True
 
         # Make AI face the target player
