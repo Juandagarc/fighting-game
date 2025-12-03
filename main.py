@@ -3,6 +3,7 @@ import os
 from views.menu import render_menu
 from views.instructions import render_instructions
 from views.game import render_game
+from views.map_selection import render_map_selection
 
 # Inicializar Pygame
 pygame.init()
@@ -37,6 +38,7 @@ player2_sprites = {
 # Control del estado del juego
 running = True
 current_view = "menu"
+current_map_path = None  # Store selected map path
 
 while running:
     for event in pygame.event.get():
@@ -51,7 +53,7 @@ while running:
                 for button in buttons:
                     if button["rect"].collidepoint(mouse_pos):
                         if button["text"] == "Jugar":
-                            current_view = "game"
+                            current_view = "map_select"
                         elif button["text"] == "Cómo se juega":
                             current_view = "instructions"
                         elif button["text"] == "Salir":
@@ -62,14 +64,27 @@ while running:
                 if back_button.collidepoint(mouse_pos):
                     current_view = "menu"
 
+            elif current_view == "map_select":
+                map_options = render_map_selection(screen)
+                for key, option in map_options.items():
+                    if option["rect"].collidepoint(mouse_pos):
+                        if key == "back":
+                            current_view = "menu"
+                        else:
+                            current_map_path = option["path"]
+                            current_view = "game"
+                        break
+
     # Renderizar la vista actual
     if current_view == "menu":
         render_menu(screen)
     elif current_view == "instructions":
         render_instructions(screen)
+    elif current_view == "map_select":
+        render_map_selection(screen)
     elif current_view == "game":
         # Pasar las hojas de sprites de todos los estados a render_game
-        render_game(screen, player1_sprites, player2_sprites)
+        render_game(screen, player1_sprites, player2_sprites, current_map_path)
 
     pygame.display.flip()
     clock.tick(60)

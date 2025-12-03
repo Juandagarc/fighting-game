@@ -3,11 +3,7 @@ import os
 from models.player import Player
 from models.DiagonalPlatform import DiagonalPlatform
 
-# Cargar fondo del juego
 current_dir = os.path.dirname(__file__)
-game_background_path = os.path.join(current_dir, "../assets/game/background.png")
-game_background = pygame.image.load(game_background_path)
-game_background = pygame.transform.scale(game_background, (1280, 720))
 
 game_active = True
 
@@ -76,11 +72,15 @@ def render_colliders(screen, colliders, diagonal_platforms):
         pygame.draw.line(screen, (0, 255, 255), (platform.x1, platform.y1), (platform.x2, platform.y2), 1)
 
 
-def render_game(screen, player1_sprites, player2_sprites):
+def render_game(screen, player1_sprites, player2_sprites, background_path):
     """
     Renderizar la vista del juego.
     """
     global game_active  # Acceder a la variable global
+
+    # Cargar fondo del juego desde el path seleccionado
+    game_background = pygame.image.load(background_path)
+    game_background = pygame.transform.scale(game_background, (1280, 720))
 
     player1 = Player(
         x=1130,
