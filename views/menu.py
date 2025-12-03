@@ -66,13 +66,14 @@ def render_menu(screen):
     screen.blit(background_image, (0, 0))
 
     # Draw the title
-    draw_text(screen, "SAMURAIS WARS", title_font, WHITE, 600, 140)  # Centered title
+    draw_text(screen, "The last knight", title_font, WHITE, 600, 140)  # Centered title
 
     # Define buttons
     buttons = [
-        create_button(480, 300, 300, 70, "Jugar", button_font, GRAY, BLACK),
-        create_button(480, 400, 300, 70, "Cómo se juega", button_font, GRAY, BLACK),
-        create_button(480, 500, 300, 70, "Salir", button_font, GRAY, BLACK),
+        create_button(480, 260, 300, 70, "Un Jugador", button_font, GRAY, BLACK),
+        create_button(480, 350, 300, 70, "Dos Jugadores", button_font, GRAY, BLACK),
+        create_button(480, 440, 300, 70, "Cómo se juega", button_font, GRAY, BLACK),
+        create_button(480, 530, 300, 70, "Salir", button_font, GRAY, BLACK),
     ]
 
     # Draw all buttons

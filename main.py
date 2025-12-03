@@ -39,6 +39,7 @@ player2_sprites = {
 running = True
 current_view = "menu"
 current_map_path = None  # Store selected map path
+is_single_player = False  # Flag for single player (AI) mode
 
 while running:
     for event in pygame.event.get():
@@ -52,7 +53,11 @@ while running:
                 buttons = render_menu(screen)
                 for button in buttons:
                     if button["rect"].collidepoint(mouse_pos):
-                        if button["text"] == "Jugar":
+                        if button["text"] == "Un Jugador":
+                            is_single_player = True
+                            current_view = "map_select"
+                        elif button["text"] == "Dos Jugadores":
+                            is_single_player = False
                             current_view = "map_select"
                         elif button["text"] == "Cómo se juega":
                             current_view = "instructions"
@@ -65,7 +70,7 @@ while running:
                     current_view = "menu"
 
             elif current_view == "map_select":
-                map_options = render_map_selection(screen)
+                map_options = render_map_selection(screen, is_single_player)
                 for key, option in map_options.items():
                     if option["rect"].collidepoint(mouse_pos):
                         if key == "back":
@@ -81,14 +86,14 @@ while running:
     elif current_view == "instructions":
         render_instructions(screen)
     elif current_view == "map_select":
-        render_map_selection(screen)
+        render_map_selection(screen, is_single_player)
     elif current_view == "game":
         # Validate map selection before starting game
         if current_map_path is None:
             current_view = "map_select"
         else:
             # Pasar las hojas de sprites de todos los estados a render_game
-            render_game(screen, player1_sprites, player2_sprites, current_map_path)
+            render_game(screen, player1_sprites, player2_sprites, current_map_path, is_single_player)
 
     pygame.display.flip()
     clock.tick(60)

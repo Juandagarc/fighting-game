@@ -59,6 +59,15 @@ flat_colliders = [
 
 flat_diagonal_platforms = []  # Sin plataformas diagonales en el mapa plano
 
+# Definir colisionadores para Test AI Arena - simple flat floor
+test_arena_colliders = [
+    pygame.Rect(0, 600, 1280, 20),  # Piso plano para AI testing
+    pygame.Rect(0, 0, 10, 720),  # Pared izquierda
+    pygame.Rect(1270, 0, 10, 720),  # Pared derecha
+]
+
+test_arena_diagonal_platforms = []  # Sin plataformas diagonales en Test Arena
+
 
 def handle_combat(player1, player2):
     """
@@ -83,23 +92,35 @@ def render_colliders(screen, colliders, diagonal_platforms):
         pygame.draw.line(screen, (0, 255, 255), (platform.x1, platform.y1), (platform.x2, platform.y2), 1)
 
 
-def render_game(screen, player1_sprites, player2_sprites, background_path):
+def render_game(screen, player1_sprites, player2_sprites, background_path, is_single_player=False):
     """
     Renderizar la vista del juego.
+    is_single_player: If True, Player 2 will be controlled by AI.
     """
     global game_active, _cached_background, _cached_background_path
 
-    # Load and cache background only if path changed
-    if _cached_background is None or _cached_background_path != background_path:
-        _cached_background = pygame.image.load(background_path)
-        _cached_background = pygame.transform.scale(_cached_background, (1280, 720))
-        _cached_background_path = background_path
+    # Check if it's test arena mode (black background for AI testing)
+    is_test_arena = background_path == "test_arena"
 
-    game_background = _cached_background
+    if is_test_arena:
+        # Create black background surface for Test Arena
+        game_background = pygame.Surface((1280, 720))
+        game_background.fill((0, 0, 0))  # Black background
+    else:
+        # Load and cache background only if path changed
+        if _cached_background is None or _cached_background_path != background_path:
+            _cached_background = pygame.image.load(background_path)
+            _cached_background = pygame.transform.scale(_cached_background, (1280, 720))
+            _cached_background_path = background_path
+
+        game_background = _cached_background
 
     # Select colliders based on the map type
-    is_flat_map = "background_flat" in background_path
-    if is_flat_map:
+    is_flat_map = "background_flat" in background_path if not is_test_arena else False
+    if is_test_arena:
+        colliders = test_arena_colliders
+        diagonal_platforms = test_arena_diagonal_platforms
+    elif is_flat_map:
         colliders = flat_colliders
         diagonal_platforms = flat_diagonal_platforms
     else:
@@ -155,11 +176,16 @@ def render_game(screen, player1_sprites, player2_sprites, background_path):
         player1.update_animation()
         player2.update_animation()
 
-        player2.update_state(keys)
-        player2.attack(keys)  # Detectar ataque
-        player2.jump(keys)
-        player2.move(keys, colliders)
-        player2.apply_gravity(colliders, diagonal_platforms)
+        # Player 2 logic: AI or Human controlled
+        if is_single_player:
+            player2.update_ai(player1, colliders)  # CPU logic
+            player2.apply_gravity(colliders, diagonal_platforms)
+        else:
+            player2.update_state(keys)  # Human logic (existing code)
+            player2.attack(keys)  # Detectar ataque
+            player2.jump(keys)
+            player2.move(keys, colliders)
+            player2.apply_gravity(colliders, diagonal_platforms)
 
         # Manejar combate
         handle_combat(player1, player2)
