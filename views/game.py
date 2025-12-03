@@ -89,7 +89,9 @@ def render_game(screen, player1_sprites, player2_sprites):
         controls=player1_controls,
         frame_width=96,  # Ancho de un fotograma
         frame_height=96,  # Alto de un fotograma
-        animation_speed=5  # Velocidad de animación
+        animation_speed=5,  # Velocidad de animación
+        hitbox_width=85,  # Hitbox un poco más ancha
+        hitbox_height=90  # Hitbox consistente
     )
 
     player2 = Player(
@@ -97,12 +99,16 @@ def render_game(screen, player1_sprites, player2_sprites):
         y=300,
         sprite_sheets=player2_sprites,
         controls=player2_controls,
-        frame_width=96,  # Ancho de un fotograma
-        frame_height=96,  # Alto de un fotograma
-        animation_speed=5  # Velocidad de animación
+        frame_width=120,  # Ancho de un fotograma (knight)
+        frame_height=80,  # Alto de un fotograma (knight)
+        animation_speed=5,  # Velocidad de animación
+        hitbox_width=85,  # Hitbox un poco más ancha
+        hitbox_height=90,  # Hitbox consistente
+        sprite_offset_y=-40  # Mover el sprite 40 píxeles hacia arriba
     )
 
     clock = pygame.time.Clock()
+
     while game_active:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

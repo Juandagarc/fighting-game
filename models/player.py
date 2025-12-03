@@ -1,17 +1,16 @@
 import pygame
 
 class Player:
-    def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed):
+    def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed, hitbox_width=None, hitbox_height=None, sprite_offset_y=0):
         """
         Initialize the player object with animations for different states.
         """
-        self.rect = pygame.Rect(x, y, frame_width - 10, frame_height)
-        self.controls = controls
-        self.health = 100
-        self.is_attacking = False  # Asegúrate de definirlo aquí
-        self.is_defending = False
-        self.attack_cooldown = 500  # En milisegundos (0.5 segundos)
-        self.last_attack_time = 0  # Marca de tiempo del último ataque
+        if hitbox_width is None:
+            hitbox_width = frame_width - 10
+        if hitbox_height is None:
+            hitbox_height = frame_height
+
+        self.rect = pygame.Rect(x, y, hitbox_width, hitbox_height)
         self.velocity = 5
         self.y_velocity = 0
         self.gravity = 0.5
@@ -20,12 +19,22 @@ class Player:
 
         self.facing_left = False  # Nueva bandera para determinar la dirección
 
+        # Controles del jugador
+        self.controls = controls
+
+        # Atributos de combate
+        self.health = 100
+        self.is_attacking = False
+        self.is_defending = False
+        self.last_attack_time = 0
+        self.attack_cooldown = 500  # Milisegundos
+
         # Animations for different states
         self.sprite_sheets = sprite_sheets
         self.frame_width = frame_width
         self.frame_height = frame_height
         self.animations = {state: self._load_frames(sheet) for state, sheet in sprite_sheets.items()}
-
+        self.sprite_offset_y = sprite_offset_y  # Offset vertical para el sprite
         # Validar que cada animación tiene fotogramas
         for state, frames in self.animations.items():
             if len(frames) == 0:
@@ -218,17 +227,17 @@ class Player:
         if self.facing_left:
             frame = pygame.transform.flip(frame, True, False)
 
-        # Dibujar el fotograma
+        # Dibujar el fotograma centrado horizontalmente y alineado al bottom de la hitbox
         sprite_x = self.rect.centerx - frame.get_width() // 2
-        sprite_y = self.rect.bottom - frame.get_height() + 40
+        sprite_y = self.rect.bottom - frame.get_height() + 40 + self.sprite_offset_y
         screen.blit(frame, (sprite_x, sprite_y))
 
         # Dibujar barra de vida
         health_bar_width = 50
-        health_bar_height = 8
-        health_ratio = self.health / 100
+        health_bar_height = 5
         bar_x = self.rect.centerx - health_bar_width // 2
-        bar_y = self.rect.top - health_bar_height - 5
+        bar_y = self.rect.top - 10
+        health_ratio = self.health / 100
         pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, health_bar_width, health_bar_height))
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, health_bar_width * health_ratio, health_bar_height))
         # Dibujar la hitbox (opcional, para depuración)
