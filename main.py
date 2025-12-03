@@ -39,6 +39,7 @@ player2_sprites = {
 running = True
 current_view = "menu"
 current_map_path = None  # Store selected map path
+is_single_player = False  # Flag for single player (AI) mode
 
 while running:
     for event in pygame.event.get():
@@ -53,7 +54,12 @@ while running:
                 for button in buttons:
                     if button["rect"].collidepoint(mouse_pos):
                         if button["text"] == "Jugar":
+                            is_single_player = False
                             current_view = "map_select"
+                        elif button["text"] == "Test AI Arena":
+                            is_single_player = True
+                            current_map_path = "test_arena"
+                            current_view = "game"
                         elif button["text"] == "Cómo se juega":
                             current_view = "instructions"
                         elif button["text"] == "Salir":
@@ -88,7 +94,7 @@ while running:
             current_view = "map_select"
         else:
             # Pasar las hojas de sprites de todos los estados a render_game
-            render_game(screen, player1_sprites, player2_sprites, current_map_path)
+            render_game(screen, player1_sprites, player2_sprites, current_map_path, is_single_player)
 
     pygame.display.flip()
     clock.tick(60)

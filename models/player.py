@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Player:
     def __init__(self, x, y, sprite_sheets, controls, frame_width, frame_height, animation_speed, hitbox_width=None, hitbox_height=None, sprite_offset_y=0):
@@ -202,6 +203,83 @@ class Player:
         Handles the player's defend action.
         """
         self.is_defending = keys[self.controls["defend"]]
+
+    def can_attack(self):
+        """
+        Checks if the player can attack based on cooldown.
+        """
+        current_time = pygame.time.get_ticks()
+        return current_time - self.last_attack_time > self.attack_cooldown
+
+    def move_left(self):
+        """
+        Move the player to the left (for AI use).
+        """
+        self.rect.x -= self.velocity
+        self.facing_left = True
+
+    def move_right(self):
+        """
+        Move the player to the right (for AI use).
+        """
+        self.rect.x += self.velocity
+        self.facing_left = False
+
+    def update_ai(self, target_player, colliders):
+        """
+        Update the AI-controlled player's behavior based on the target player's position.
+        """
+        attack_range = 100  # Distance within which AI will attack
+        distance_x = abs(self.rect.x - target_player.rect.x)
+
+        # Reset defending state at the start of each update
+        self.is_defending = False
+
+        # MOVEMENT: If target is far, move towards them
+        if distance_x > attack_range:
+            if self.rect.x < target_player.rect.x:
+                self.move_right()
+                # Check for wall collision
+                for collider in colliders:
+                    if self.rect.colliderect(collider):
+                        self.rect.right = collider.left
+                        break
+            else:
+                self.move_left()
+                # Check for wall collision
+                for collider in colliders:
+                    if self.rect.colliderect(collider):
+                        self.rect.left = collider.right
+                        break
+            # Update animation to running
+            if self.current_animation != "running":
+                self.current_animation = "running"
+                self.current_frame = 0
+
+        # ATTACK: If in range and cooldown is ready
+        elif distance_x <= attack_range and self.can_attack():
+            self.is_attacking = True
+            self.last_attack_time = pygame.time.get_ticks()
+            if self.current_animation != "attacking":
+                self.current_animation = "attacking"
+                self.current_frame = 0
+        else:
+            # Idle when not moving or attacking
+            if self.current_animation not in ["attacking", "jumping"]:
+                if self.current_animation != "idle":
+                    self.current_animation = "idle"
+                    self.current_frame = 0
+            self.is_attacking = False
+
+        # DEFENSE: Random chance to block if target is attacking
+        if target_player.is_attacking and random.random() < 0.1:  # 10% chance
+            self.is_defending = True
+
+        # Make AI face the target player
+        if self.rect.x > target_player.rect.x:
+            self.facing_left = True
+        else:
+            self.facing_left = False
 
     def take_damage(self, amount):
         """
