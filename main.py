@@ -83,8 +83,12 @@ while running:
     elif current_view == "map_select":
         render_map_selection(screen)
     elif current_view == "game":
-        # Pasar las hojas de sprites de todos los estados a render_game
-        render_game(screen, player1_sprites, player2_sprites, current_map_path)
+        # Validate map selection before starting game
+        if current_map_path is None:
+            current_view = "map_select"
+        else:
+            # Pasar las hojas de sprites de todos los estados a render_game
+            render_game(screen, player1_sprites, player2_sprites, current_map_path)
 
     pygame.display.flip()
     clock.tick(60)

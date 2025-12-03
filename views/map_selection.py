@@ -19,12 +19,20 @@ DARK_GRAY = (100, 100, 100)
 ORIGINAL_MAP_PATH = os.path.join(current_dir, "../assets/game/background.png")
 FLAT_MAP_PATH = os.path.join(current_dir, "../assets/game/background_flat.png")
 
-# Load map thumbnails
-original_thumbnail = pygame.image.load(ORIGINAL_MAP_PATH)
-original_thumbnail = pygame.transform.scale(original_thumbnail, (400, 225))
+# Lazy-loaded thumbnails
+_original_thumbnail = None
+_flat_thumbnail = None
 
-flat_thumbnail = pygame.image.load(FLAT_MAP_PATH)
-flat_thumbnail = pygame.transform.scale(flat_thumbnail, (400, 225))
+
+def _load_thumbnails():
+    """Load and cache map thumbnails lazily."""
+    global _original_thumbnail, _flat_thumbnail
+    if _original_thumbnail is None:
+        _original_thumbnail = pygame.image.load(ORIGINAL_MAP_PATH)
+        _original_thumbnail = pygame.transform.scale(_original_thumbnail, (400, 225))
+    if _flat_thumbnail is None:
+        _flat_thumbnail = pygame.image.load(FLAT_MAP_PATH)
+        _flat_thumbnail = pygame.transform.scale(_flat_thumbnail, (400, 225))
 
 
 def draw_text(surface, text, font, color, x, y):
@@ -41,6 +49,9 @@ def render_map_selection(screen):
     Renders the map selection view with 2 map options.
     Returns the path of the selected map when clicked, or None if no selection made.
     """
+    # Load thumbnails lazily
+    _load_thumbnails()
+
     # Fill background with dark color
     screen.fill(DARK_GRAY)
 
@@ -53,10 +64,10 @@ def render_map_selection(screen):
 
     # Draw map thumbnails with borders
     pygame.draw.rect(screen, WHITE, original_rect.inflate(10, 10), 3)
-    screen.blit(original_thumbnail, original_rect.topleft)
+    screen.blit(_original_thumbnail, original_rect.topleft)
 
     pygame.draw.rect(screen, WHITE, flat_rect.inflate(10, 10), 3)
-    screen.blit(flat_thumbnail, flat_rect.topleft)
+    screen.blit(_flat_thumbnail, flat_rect.topleft)
 
     # Draw map labels
     draw_text(screen, "Mapa Original", button_font, WHITE, 340, 460)

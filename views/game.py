@@ -6,6 +6,8 @@ from models.DiagonalPlatform import DiagonalPlatform
 current_dir = os.path.dirname(__file__)
 
 game_active = True
+_cached_background = None
+_cached_background_path = None
 
 font_path = os.path.join(current_dir, "../assets/fonts/Tiny5/Tiny5-Regular.ttf")
 title_font = pygame.font.Font(font_path, 80)
@@ -76,11 +78,15 @@ def render_game(screen, player1_sprites, player2_sprites, background_path):
     """
     Renderizar la vista del juego.
     """
-    global game_active  # Acceder a la variable global
+    global game_active, _cached_background, _cached_background_path
 
-    # Cargar fondo del juego desde el path seleccionado
-    game_background = pygame.image.load(background_path)
-    game_background = pygame.transform.scale(game_background, (1280, 720))
+    # Load and cache background only if path changed
+    if _cached_background is None or _cached_background_path != background_path:
+        _cached_background = pygame.image.load(background_path)
+        _cached_background = pygame.transform.scale(_cached_background, (1280, 720))
+        _cached_background_path = background_path
+
+    game_background = _cached_background
 
     player1 = Player(
         x=1130,
